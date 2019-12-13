@@ -63,5 +63,7 @@ This code was built as part of Thomas Brambor's Fall 2019 Modern Data Structures
 
 Additionally I'd like to acknowledge Colin Fay, who created a blogpost about building API wrappers (https://colinfay.me/build-api-wrapper-package-r/). Combining what I learned in my course with the basic steps and framework Colin described was invaluable for effectively moving through the process and building in some sensible components and tests.
 
+Last, I would like to thank Trent Ellingsen of Board Game Atlas who was wonderfully helpful in describing the functionality of BGA and discussing future directions of the platform.
+
   Please note that this project is released with a [Contributor Code of Conduct](CODE_OF_CONDUCT.md).
   By participating in this project you agree to abide by its terms.
