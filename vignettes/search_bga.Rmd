@@ -1,0 +1,500 @@
+---
+title: "Introduction to search_bga()"
+author: "Michael Weisner"
+date: "12/12/2019"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to search_bga()}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(knitr)
+library(dplyr)
+```
+
+```{r setup}
+library(boardgameatlasR)
+```
+
+## Introduction
+The boardgameatlasR package contains a function called `search_bga()`. `search_bga()` is an API wrapper for the API of https://www.boardgameatlas.com.
+
+This vignette will cover a few of the basic usages of `search_bga()` and how to avoid some common mistakes.
+
+## Setup
+Before you get started, you'll have to take the following steps:
+
+* Register with https://www.boardgameatlas.com
+
+* Create an "app" to get your client_id
+
+* Add your client_id value to your R environment as "BOARDGAMEATLAS_PAT"
+
+## Adding your client_id to your R Environment
+
+You can add the token with code like edit_r_environ() from the usethis package
+
+
+And then enter your BGA client_id in the following manner into your .Renviron file:
+
+```{r, evaluate = FALSE}
+# Boardgame Atlas API Key
+BOARDGAMEATLAS_PAT = "YOUR_CLIENT_ID"
+```
+
+Once you have done this, you'll have to restart R or your R session for the changes to take effect.
+
+## Arguments of search_bga()
+
+### API Arguments Translated
+
+Below I've included how each API argument - which can be found at https://www.boardgameatlas.com/api/docs/search - are translated from the `search_bga()` arguments. In general they are designed to create ranges of value and to be inclusive of the specified number. This differs from the actual API which in most cases has three parameters than can be specified; an exact match, a "greater than" parameter, and a "less than" parameter. For instance, the API accepts arguments for an exact year_published parameter (the exact match), a gt_year_published parameter (greater than the specified year), and also a lt_year_published parameter (less than the specified year). The arguments in `search_bga()` utilize the less than and greater year functions but make them inclusive of the specified year for ease of use and general utility.
+
+----------------------------------------------------------------------------------------
+  API Query Value    search_bga Argument       Argument Type        Example
+------------------ -------------------------- ---------------- -------------------------
+limit                     limit                integer                  "30"
+
+skip                      skip                 integer                  "100"
+
+ids                       ids                  string               "id1,id2,id3"
+
+kickstarter               kickstarter           boolean                  "TRUE"
+
+random                    random               boolean                  "TRUE"
+
+name                      name                 string               "Ticket to Ride"
+
+exact                     name_exact             boolean                  "TRUE"
+
+fuzzy_match               name_fuzzy             boolean                  "TRUE"
+
+designer                  designer              string              "Trent Ellingsen"
+
+publisher                 publisher             string               "5 Color Combo"
+
+artist                    artist                string               "Dimitri Bielak"
+
+mechanics                 mechanics             string             "vZsDDAdOoe,WPytek5P8l"
+
+categories                categories            string              "hBqZ3Ar4RJ,eX8uuNlQkQ"
+
+order_by                  order_by               string                  "popularity"
+
+ascending               ascending              boolean                   FALSE
+
+gt_min_players          min_players            integer                    "3"
+
+lt_max_players         max_players             integer                    "8"
+
+gt_min_playtime        min_playtime            integer                    "30"
+
+lt_max_playtime        max_playtime            integer                    "90"
+
+gt_min_age             min_age                 integer                    "4"
+
+lt_min_age             max_age                 integer                    "10"
+
+gt_year_published      min_year                integer                    "2010"
+
+lt_year_published      max_year                integer                    "2018"
+
+gt_price              min_price                double                     "10.00"
+
+lt_price              max_price                double                     "75.00"
+
+gt_min_msrp           min_msrp                 double                      "30.00"
+
+lt_max_msrp           max_msrp                 double                      "100.00"
+
+gt_min_discount       min_discount            double                      "0.50"
+
+lt_max_discount       max_discount            double                      "-0.5"
+
+gt_reddit_count        min_reddit_total       integer                     "100"
+
+lt_reddit_count       lt_reddit_count         integer                     "500"
+
+gt_reddit_week_count  min_reddit_week         integer                     "30
+
+lt_reddit_week_count  max_reddit_week         integer                     "100"
+
+gt_reddit_day_count  min_reddit_day           integer                     "5"
+
+lt_reddit_day_count  max_reddit_day           integer                     "20"
+
+client_id            client_id_pat            string                 "AfDFioajafsd"
+----------------------------------------------------------------------------------------
+
+Please note that the client_id value above is not a real ID and will not work if specified.
+
+### limit & skip
+
+An important thing to understand is that the BGA API is restricted to queries of no more than 100 objects per query. In order to get more than 100 games you have to use the skip feature to start where you left off. For instance, the first five games returned when ordered by popularity (at the time of writing this, 12/12/2019) are the following:
+
+--------------------------------------------------------------
+     id                 name             year_published  ...
+------------ -------------------------- ---------------- -----
+ kPDxpJZ8PD        Spirit Island              2016        ...
+
+ RLlDWHh7hR          Gloomhaven               2017        ...
+
+ i5Oqu5VZgP             Azul                  2017        ...
+
+ yqR4PtpO8X            Scythe                 2016        ...
+
+ 6FmFeux5xH           Pandemic                2008        ...
+--------------------------------------------------------------
+
+This could be queried with the following:
+
+```{r, evaluate = FALSE}
+first_5 <- search_bga(limit = 5, skip = 0, order_by = "popularity")
+```
+
+The above code skips no games, returning the first object onward up to the limit, which in this case is 5 game objects. The default order_by value is popularity, which is based on the total number of times the game is mentioned at https://www.reddit.com/r/boardgames - a subreddit - a kind of forum - that is based on the discussion and recommendation of board games.
+
+The 6th-10th games returned when ordered by popularity are as follows:
+
+--------------------------------------------------------------
+     id                 name             year_published   ...
+------------ -------------------------- ---------------- -----
+ oGVgRSAKwX         Carcassonne               2000        ...
+
+ fDn9rQjH9O      Terraforming Mars            2016        ...
+
+ TAAifFP590             Root                  2018        ...
+
+ FCuXPSfhDR          Concordia                2013        ...
+
+ 6VQXkkC5ql   Dominion: Second Edition        2016        ...
+-------------------------------------------------------------
+
+And the above could be queried with the following:
+```{r, evaluate = FALSE}
+second_5 <-  search_bga(limit = 5, skip = 5, order_by = "popularity")
+```
+
+You can see above it skips the first 5 games and returns an additional 5 games, the limit.
+
+You can use this pattern to go beyond the 100 game limit of the API by requesting 100 games and then adjusting the skip value, like so:
+
+```{r, evaluate = FALSE}
+first_100 <- search_bga(limit = 100, skip = 0, order_by = "popularity")
+second_100 <- search_bga(limit = 100, skip = 100, order_by = "popularity")
+```
+
+You could then merge the datasets with code along the lines of the following:
+
+```{r, evaluate = FALSE}
+first_200 <- cbind(first_100, second_100)
+```
+
+### String Arguments
+
+#### ids
+
+Individual games can be queried by using their internal ID values, which BGA uses to inventory games. These are not particularly human readable, however, and must be exact comma-separated matches. Incorrect ID strings can produce 404 errors in the API query, or simply return no games. 
+
+The ID for the game The Settlers of Catan is SVQRjsXrhj. The ID for the game The Last Stand is OIXt3DmJU0. To return these games specfically, you would use this query:
+
+```{r}
+id_search <- search_bga(ids="SVQRjsXrhj,OIXt3DmJU0")
+```
+
+You can put in any number of ID values as long as they are all separated by commas and contain no spaces.
+
+#### name
+
+It's important to talk about what is probably the most logical way to search for a game, which is by its name. Name is relatively complicated in terms of this API, however.
+
+* name, when used, will supposedly search for games based on the start of the string(s) provided to it. In practice, however, it seems to search for each word provided to it. For instance, name = "cata" returns a game called "Billy Biber." name = "catan", on the other hand, will turn up many games in the Catan family. We'll discuss the exact and fuzzy augmentations later.
+
+#### designer, publisher, artist
+
+The arguments designer, publisher, and artist all function as exact matches. This may make their usefulness more limited if there are any discrepencies or errors in these fields, but it may be useful to use to hone in on specific groups or individuals. This may be more useful to get complete sets of game families compared to searches by names. For instance, if I search for the publisher "Catan Studio" who designed the original Settlers of Catan game, I get 27 games back. In this case they are all Catan-family games. I can search this with the following query:
+
+```{r}
+publisher_search <- search_bga(publisher = "Catan Studio")
+```
+
+It's important to note that these are the "primary" attributions, and sometimes games have multiple listed designers, artists, and publishers. A full list is contained int he all_designers, all_publishers, and all_artists variables. Additionally there is a variable for all_developers, which is not possible to query.
+
+#### mechanics
+
+Mechanics functions similar to ids, in that each mechanic has a specific ID value associated with it and can be queried by entering them as a comma separated list. The main issue is that the mechanics are somewhat ill defined, overlapping, and not always equally attributed to all games at this point. Still, it can be useful. For instance, if I want the 30 most popular games that have a dice rolling mechanic I can use the mechanics value of "R0bGq4cAl4" with the following code:
+
+```{r}
+dice_rolling_games <- search_bga(mechanics="R0bGq4cAl4")
+```
+
+For a complete list of the id values you can consult https://www.boardgameatlas.com/api/docs/game/mechanics, which allows you query https://www.boardgameatlas.com/api/game/mechanics? and see all mechanics options. Unfortunately these have no listed formal definitions and thus may have limited usefulness. All `search_bga()` queries will return binary values of 1 for TRUE and 0 for FALSE for the attribution of each mechanics. Mechanics are also prepended with "mech_" in the variable names, for easy identification.
+
+#### Categories
+
+Like mechanics, categories also functions similar to ids, in that each mechanic has a specific ID value associated with it and can be queried by entering them as a comma separated list. The main issue is that the categories are somewhat ill defined, overlapping, and not always equally attributed to all games at this point. Still, it can be useful. For instance, if I want the 10 most popular games that are labeled as "Eurogames" - which are German-style board games that have risen to general popularity in the last several decades - I can use the categories value of "h8wfZG0j3I" with the following code:
+
+```{r}
+eurogame_games <- search_bga(categories="h8wfZG0j3I", limit = 10)
+```
+
+For a complete list of the ID values you can consult https://www.boardgameatlas.com/api/docs/game/categories, which allows you query https://www.boardgameatlas.com/api/game/categories? and see all category options. Unfortunately these have no listed formal definitions and thus may have limited usefulness. All `search_bga()` queries will return binary values of 1 for TRUE and 0 for FALSE for the attribution of each category. Categories are also prepended with "cat_" in the variable names, for easy identification.
+
+#### order_by
+
+The order_by variable takes specific string arguments. Typos or other values will cause the query to stop. The values are as follows:
+
+* popularity - this is defined as the highest amount of comments mentioning the game on https://www.reddit.com/r/boardgames since 2018.
+
+* price - this orders from the highest listed price to lowest price.
+
+* deadline - this only works if kickstarter = TRUE, and then returns games based on the earliest ending kickstarter campaign. 
+
+* discount - discount is a percentage based on the price / MSRP. This should not be greater than 1 (100%), but can be negative sometimes when the game is more expensive than the recommended retail price.
+
+* average_user_rating - this orders games by the average user rating, which is a 0-5 scale of user generated ratings. It is unweighted, so games with even just a single vote my show up at the top of the list.
+
+* num_user_ratings - this orders games by the number of user ratings, with the highest number of ratings are returned first. This may arguably be a more useful measure of "popularity" than the reddit comments used in the official "popularity" setting of order_by.
+
+* reddit_total_count - This returns games with the highest number of comments in which the game was mentioned from https://www.reddit.com/r/boardgames since BGA began collecting the data in 2018.
+
+* reddit_week_count - This returns games with the highest number of comments in which the game was mentioned from https://www.reddit.com/r/boardgames in the past week.
+
+* reddit_day_count - This returns games with the highest number of comments in which the game was mentioned from https://www.reddit.com/r/boardgames from the previous day of the query.
+
+* name - this returns games in alphabetical order of the games' names.
+
+* year_published - this returns games with the highest "year_published" value first. Unfortunately, the API does not currently differentiate between BCE and CE, meaning that games like Go, which were invented in roughly 2200 BCE show up near the top of the list, with a year_published value of 2200. Future work may include coding that games with values higher than the present year may be set to negative values, but this requires more investigation.
+
+* min_age - this returns games in order of the highest minimum age to the lowest minimum age.
+
+* min_playtime -  this returns games in order of the highest minimum playtime to the lowest minimum playtime.
+
+* max_playtime - this returns games in order of the highest maximum playtime to the lowest maximum playtime.
+
+* min_players - this returns games in order of the highest number of minimum players to the lowest number of minimum players. 
+
+* max_players - this returns games in order of the highest number of maximum players to the lowest number of maximum players. 
+
+### Logical Arguments
+
+The `search_bga()` function includes a number of logical arguments, including kickstarter, random, name_exact, name_fuzzy, ascending.
+
+* kickstarter - WARNING this has an existing API problem (not in this code) where specifying kicstarter as ANYTHING (TRUE, FALSE, or NULL) will return active board game kickstarter campaigns. These have not yet completed their campaigns. An issue with the API is that if kickstarter is set to FALSE or NULL it will still produce kickstarter games, as it seems to be linked to a page of the site devoted to Kickstarter games. 
+
+To avoid Kickstarter games, simply DO NOT SPECIFY KICKSTARTER in your query. 
+
+Kickstarter has been a popular platform for funding board games in recent years, so data regarding the games funded this way may be useful, but the current API has some issues. This will hopefully change as the platform develops.
+
+* random, if set to TRUE, will return random board games. Compared to the kickstarter argument this plays more nicely with other arguments. Behind the curtain, random behaves differently from all other boolean values, not requiring any coerscion from a traditional R logical boolean unlike the other values.
+
+* name_exact & name_fuzzy both augment the name argument, but it's somewhat unclear how. For instance, while searching for search_bga(name = "Settlers of Catan") returned 23 games, including many games with that exact phrasing, search_bga(name = "Settlers of Catan", name_exact = TRUE) returned none, and search_bga(name = "Settlers of Catan", name_fuzzy = TRUE) returned only 9, most of which contained "Settlers of Catan" in the name.
+
+* ascending, if FALSE, will return the top values - e.g. the "most popular" game if order_by is set to "popularity." Conversely, setting it to TRUE will draw from the bottom of the list, but how it is ordered with games with the same value is unclear. 
+
+### Gameplay Statistics
+
+The BGA API has multiple ways of querying certian values, such as an exact match, "less than" (e.g. lt_min_players), and "greater than" (e.g. gt_max_players) versions of most metrics. To simplify this system and maximize functionality, I focused on the query arguments that allowed for the building of ranges of requests. In most cases I created a bottom floor and a ceiling variable, which allow for the querying of specific values by making the two values equal. Down the line it might be valuable to add smoe of these other versions, but this provided the most elegant and simple solution to capturing, theoretically, every useful range of data.
+
+* min_players & max_players, these are integer values that map onto the "gt_min_players" and "lt_max_players" values, respectively. This means that you can set the minimum amount of players and the maximum amount. One issue is one could theoretically set the minimum above the maximum, which returns mostly mislabled games.
+
+* min_playtime & max_playtime, like players, these map to a similar range of "gt_min_playtime" and "lt_max_playtime", respectively, to create a range of gameplay times. One major issue is that some games do not have a maximum playtime. These are measuring number of minutes, so a value of "60" means 60 minutes.
+
+* min_age & max_age, games don't typically have a maximum age range, and in fact the BGA API only provides a min_age variable. This was designed to provide ranges of minimum age values using "gt_min_age" and "lt_min_age", respectively. This measures years of age.
+
+* min_year & max_year follow a similar pattern to age of mapping onto "gt_year_published" and "lt_year_published" to produce a range of year values.
+
+Some sample values that these query arguments check against these can be seen below:
+
+------------------------------------------------------------------------------------
+ year_published   min_players   max_players   min_playtime   max_playtime   min_age 
+---------------- ------------- ------------- -------------- -------------- ---------
+      2016             1             4             90            120          13    
+
+      2017             1             4             60            150          12    
+
+      2017             2             4             30             60           8    
+
+      2016             1             5             90            120          14    
+
+      2008             2             4             45             60           8    
+------------------------------------------------------------------------------------
+
+## Pricing
+
+* min_price & max_price - Like in the gameplay statistics arguments, these set minimum and maximum ranges of financial values. In this case, the minimum and maximum price in USD that the game is listed online. These equate to gt_price and lt_price respectively.
+
+* min_msrp & max_msrp - similarly to price, these set minimum and maximum ranges of the manufacturer’s suggested retail price (MSRP). These equate to gt_min_msrp and lt_max_msrp respectively.
+
+* min_discount & max_discount - the discount amount is 1 minusthe price value divided by the MSRP (1 - (price/msrp). These map onto gt_min_discount and lt_max_discount, respectively.
+
+## Data
+
+`search_bga()` will return up to 100 observations (depending on what limit is set to) and 254 variables. These include some of the aforementioned game statistics, reviews, names and people associated with it as well as descriptions of the games, links to the game image and URLs. It also includes kickstarter data (if kickstarter=TRUE), price data, physical box dimensions, reddit comments, and a large number of mechanics and categories attributed to the game. Below I will give some examples of the data types not covered above.
+
+### Textual Data
+
+Text variables include description (below), image_url, url, official_url, rules_url, kickstarter_url, as well as the various name variables.
+
+--------------------------------
+          description           
+--------------------------------
+ Powerful Spirits have existed  
+  on this isolated island for   
+ time immemorial. They are both 
+ part of the natural world and  
+ - at the same time - something 
+     beyond nature. Native      
+ Islanders, known as the Dahan, 
+  have learned how to co-exist  
+  with the spirits, but with a  
+    healthy dose of fear and    
+  reverence. However, now, the  
+        island has been         
+   &quot;discovered&quot; by    
+ invaders from a far-off land.  
+  These would-be colonists are  
+    taking over the land and    
+ upsetting the natural balance, 
+   destroying the presence of   
+     Spirits as they go. As     
+   Spirits, you must grow in    
+   power and work together to   
+  drive the invaders from your  
+   island... before it's too    
+             late!              
+--------------------------------
+
+### Monetary Data
+
+The monetary data revolves around price, MSRP, and recorded price values all in USD. 1 - (price / msrp) generates the discount value and the historical low price is the recorded lowest price. There are historical prices on BGA but require use of another API that will be added in the future.
+
+-----------------------------------------------------------------------
+ price   msrp    discount   historical_low_price   historical_low_date 
+------- ------- ---------- ---------------------- ---------------------
+ 53.99   79.95     0.32            47.97               2019-11-27      
+
+ 99.4     140      0.29            80.75               2019-07-15      
+
+ 18.99   39.99     0.53            17.99               2019-08-03      
+-----------------------------------------------------------------------
+
+### Publisher Data
+
+Below you can see some examples of publishers and designers. the all_* variables are often comma separated lists of names.
+
+-----------------------------------------------------------------------
+ primary_publisher           all_publishers            all_designers   
+-------------------- ------------------------------- ------------------
+ Greater Than Games        Greater Than Games          R. Eric Reuss   
+
+ Cephalofair Games          Cephalofair Games          Isaac Childres  
+
+  Next Move Games     Next Move Games, Plan B Games   Michael Kiesling 
+-----------------------------------------------------------------------
+
+So far it appears that no game has developers attributed yet.
+
+-------------------------------------------------
+ all_developers            all_artists           
+---------------- --------------------------------
+                  Jason Behnke, Kat G Bermelin,  
+                    Loïc Billiau, Cari Corene,   
+                   Lucas Durham, Rocky Hammer,   
+                   Sydni Kruger, Nolan Nasser,   
+                   Jorge Ramos, Adam Rebottaro,  
+                  Moro Rogers, Graham Sternberg, 
+                  Shane Tyree, Joshua Wright (I) 
+
+                    Alexandr Elichev, Josh T.    
+                      McDowell, Alvaro Nebot     
+
+                      Philippe Guérin, Chris     
+                            Quilliams            
+-------------------------------------------------
+
+### User Ratings
+
+These are user ratings registered on the BGA website. As said previously, they range from 0-5 for games, 5 being the top and 0 being the lowest. 
+
+----------------------------------------
+ num_user_ratings   average_user_rating 
+------------------ ---------------------
+       126                 3.937        
+
+       132                 4.159        
+
+       208                 3.633        
+----------------------------------------
+
+### Physical Game Data
+
+These are board game box dimensions, typically in inches:
+
+----------------------------------------------------
+ size_height   size_width   size_depth   size_units 
+------------- ------------ ------------ ------------
+    11.6           3           11.6        inches   
+
+    16.2          7.5          11.8        inches   
+
+    10.2          2.8          10.2        inches   
+----------------------------------------------------
+
+### Reddit Data
+
+The reddit data comes begins in 2018, when BGA began tracking the information on https://www.reddit.com/r/boardgames - a type of forum known as a subreddit - where people interested in board games can discuss and recommend games with each other. The measurements are total (since 2018), the past week, and the past day. There is also a query data variable created to put these in context:
+
+------------------------------------------------------------------------------
+ reddit_all_time_count   reddit_week_count   reddit_day_count   date_of_query 
+----------------------- ------------------- ------------------ ---------------
+         1499                    9                  13           2019-12-13   
+
+         1392                   13                  35           2019-12-13   
+
+         1173                   10                  9            2019-12-13   
+------------------------------------------------------------------------------
+
+### Mechanics
+
+Each `search_bga()` query parses the list of mechanics and then creates a binary variable (0-1) if the mechanic is labeled for the game. Numeric binary values were chosen for ease of use but may be changed to logical boolean values in the future. Below you can see a small selection of how this data may look in practice:
+
+-----------------------------------------------------------------------------
+ mech_action_movement   mech_action_point_allowance   mech_action_selection   
+---------------------- ----------------------------- ------------------------ 
+          0                          1                          0          
+
+          1                          1                          0                    
+
+          0                          0                          0           
+
+          1                          0                          0           
+
+          0                          0                          1           
+----------------------------------------------------------------------------
+
+### Categories
+
+Each `search_bga()` query parses the list of categories and then creates a binary variable (0-1) if the category is labeled for the game. Numeric binary values were chosen for ease of use but may be changed to logical boolean values in the future. Below you can see a small selection of how this data may look in practice:
+
+----------------------------------------------------------------------
+ cat_campaign   cat_card_game   cat_children_game   cat_city_building 
+-------------- --------------- ------------------- -------------------
+      0               0                 0                   0         
+
+      0               0                 0                   0         
+
+      0               1                 0                   0         
+
+      0               0                 0                   0         
+
+      0               1                 0                   1         
+----------------------------------------------------------------------
+
+

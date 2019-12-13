@@ -1,0 +1,28 @@
+Package: boardgameatlasR
+Title: Board Game Atlas API Wrapper
+Version: 0.0.1
+Authors@R: person('Michael', 'Weisner', email = 'mw2931@columbia.edu', role = c('cre', 'aut'))
+Description: A basic API
+            wrapper for querying the Board Game Atlas (BGA) search API,
+            found at https://www.boardgameatlas.com/api.
+            BGA is an website that catalogs board game information
+            and statistics, such as the mechanics, number of players,
+            and playtime. The boardgameatlasR app will allow users to query
+            the API and coerce the retrieved games into a tidy format.
+            It also includes metrics on review scores of the games,
+            review text, recent comments of the game on www.reddit.com, and more.
+            For full information on the API, please consult https://www.boardgameatlas.com/api/docs.
+License: MIT + file LICENSE
+Imports: attempt, curl, httr, jsonlite, purrr, dplyr, tidyverse
+LazyData: true
+URL: https://github.com/mdweisner/boardgameatlasr
+BugReports: https://github.com/mdweisner/boardgameatlasr
+Encoding: UTF-8
+RoxygenNote: 6.1.1
+Suggests: 
+    spelling,
+    testthat,
+    knitr,
+    rmarkdown
+Language: en-US
+VignetteBuilder: knitr

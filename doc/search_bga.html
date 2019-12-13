@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<meta name="author" content="Michael Weisner" />
+
+<meta name="date" content="2019-12-12" />
+
+<title>Introduction to search_bga()</title>
+
+
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+a.sourceLine { display: inline-block; line-height: 1.25; }
+a.sourceLine { pointer-events: none; color: inherit; text-decoration: inherit; }
+a.sourceLine:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+code.sourceCode { white-space: pre-wrap; }
+a.sourceLine { text-indent: -1em; padding-left: 1em; }
+}
+pre.numberSource a.sourceLine
+  { position: relative; left: -4em; }
+pre.numberSource a.sourceLine::before
+  { content: attr(data-line-number);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; pointer-events: all; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {  }
+@media screen {
+a.sourceLine::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    for (var j = 0; j < rules.length; j++) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") continue;
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') continue;
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#header {
+text-align: center;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; }  code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">Introduction to search_bga()</h1>
+<h4 class="author">Michael Weisner</h4>
+<h4 class="date">12/12/2019</h4>
+
+
+
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb1-1" data-line-number="1"><span class="kw">library</span>(boardgameatlasR)</a></code></pre></div>
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>The boardgameatlasR package contains a function called <code>search_bga()</code>. <code>search_bga()</code> is an API wrapper for the API of <a href="https://www.boardgameatlas.com" class="uri">https://www.boardgameatlas.com</a>.</p>
+<p>This vignette will cover a few of the basic usages of <code>search_bga()</code> and how to avoid some common mistakes.</p>
+</div>
+<div id="setup" class="section level2">
+<h2>Setup</h2>
+<p>Before you get started, you’ll have to take the following steps:</p>
+<ul>
+<li><p>Register with <a href="https://www.boardgameatlas.com" class="uri">https://www.boardgameatlas.com</a></p></li>
+<li><p>Create an “app” to get your client_id</p></li>
+<li><p>Add your client_id value to your R environment as “BOARDGAMEATLAS_PAT”</p></li>
+</ul>
+</div>
+<div id="adding-your-client_id-to-your-r-environment" class="section level2">
+<h2>Adding your client_id to your R Environment</h2>
+<p>You can add the token with code like edit_r_environ() from the usethis package</p>
+<p>And then enter your BGA client_id in the following manner into your .Renviron file:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb2-1" data-line-number="1"><span class="co"># Boardgame Atlas API Key</span></a>
+<a class="sourceLine" id="cb2-2" data-line-number="2">BOARDGAMEATLAS_PAT =<span class="st"> &quot;YOUR_CLIENT_ID&quot;</span></a></code></pre></div>
+<p>Once you have done this, you’ll have to restart R or your R session for the changes to take effect.</p>
+</div>
+<div id="arguments-of-search_bga" class="section level2">
+<h2>Arguments of search_bga()</h2>
+<div id="api-arguments-translated" class="section level3">
+<h3>API Arguments Translated</h3>
+<p>Below I’ve included how each API argument - which can be found at <a href="https://www.boardgameatlas.com/api/docs/search" class="uri">https://www.boardgameatlas.com/api/docs/search</a> - are translated from the <code>search_bga()</code> arguments. In general they are designed to create ranges of value and to be inclusive of the specified number. This differs from the actual API which in most cases has three parameters than can be specified; an exact match, a “greater than” parameter, and a “less than” parameter. For instance, the API accepts arguments for an exact year_published parameter (the exact match), a gt_year_published parameter (greater than the specified year), and also a lt_year_published parameter (less than the specified year). The arguments in <code>search_bga()</code> utilize the less than and greater year functions but make them inclusive of the specified year for ease of use and general utility.</p>
+<table>
+<colgroup>
+<col width="21%"></col>
+<col width="30%"></col>
+<col width="19%"></col>
+<col width="29%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">API Query Value</th>
+<th align="center">search_bga Argument</th>
+<th align="center">Argument Type</th>
+<th align="center">Example</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">limit</td>
+<td align="center">limit</td>
+<td align="center">integer</td>
+<td align="center">“30”</td>
+</tr>
+<tr class="even">
+<td align="center">skip</td>
+<td align="center">skip</td>
+<td align="center">integer</td>
+<td align="center">“100”</td>
+</tr>
+<tr class="odd">
+<td align="center">ids</td>
+<td align="center">ids</td>
+<td align="center">string</td>
+<td align="center">“id1,id2,id3”</td>
+</tr>
+<tr class="even">
+<td align="center">kickstarter</td>
+<td align="center">kickstarter</td>
+<td align="center">boolean</td>
+<td align="center">“TRUE”</td>
+</tr>
+<tr class="odd">
+<td align="center">random</td>
+<td align="center">random</td>
+<td align="center">boolean</td>
+<td align="center">“TRUE”</td>
+</tr>
+<tr class="even">
+<td align="center">name</td>
+<td align="center">name</td>
+<td align="center">string</td>
+<td align="center">“Ticket to Ride”</td>
+</tr>
+<tr class="odd">
+<td align="center">exact</td>
+<td align="center">name_exact</td>
+<td align="center">boolean</td>
+<td align="center">“TRUE”</td>
+</tr>
+<tr class="even">
+<td align="center">fuzzy_match</td>
+<td align="center">name_fuzzy</td>
+<td align="center">boolean</td>
+<td align="center">“TRUE”</td>
+</tr>
+<tr class="odd">
+<td align="center">designer</td>
+<td align="center">designer</td>
+<td align="center">string</td>
+<td align="center">“Trent Ellingsen”</td>
+</tr>
+<tr class="even">
+<td align="center">publisher</td>
+<td align="center">publisher</td>
+<td align="center">string</td>
+<td align="center">“5 Color Combo”</td>
+</tr>
+<tr class="odd">
+<td align="center">artist</td>
+<td align="center">artist</td>
+<td align="center">string</td>
+<td align="center">“Dimitri Bielak”</td>
+</tr>
+<tr class="even">
+<td align="center">mechanics</td>
+<td align="center">mechanics</td>
+<td align="center">string</td>
+<td align="center">“vZsDDAdOoe,WPytek5P8l”</td>
+</tr>
+<tr class="odd">
+<td align="center">categories</td>
+<td align="center">categories</td>
+<td align="center">string</td>
+<td align="center">“hBqZ3Ar4RJ,eX8uuNlQkQ”</td>
+</tr>
+<tr class="even">
+<td align="center">order_by</td>
+<td align="center">order_by</td>
+<td align="center">string</td>
+<td align="center">“popularity”</td>
+</tr>
+<tr class="odd">
+<td align="center">ascending</td>
+<td align="center">ascending</td>
+<td align="center">boolean</td>
+<td align="center">FALSE</td>
+</tr>
+<tr class="even">
+<td align="center">gt_min_players</td>
+<td align="center">min_players</td>
+<td align="center">integer</td>
+<td align="center">“3”</td>
+</tr>
+<tr class="odd">
+<td align="center">lt_max_players</td>
+<td align="center">max_players</td>
+<td align="center">integer</td>
+<td align="center">“8”</td>
+</tr>
+<tr class="even">
+<td align="center">gt_min_playtime</td>
+<td align="center">min_playtime</td>
+<td align="center">integer</td>
+<td align="center">“30”</td>
+</tr>
+<tr class="odd">
+<td align="center">lt_max_playtime</td>
+<td align="center">max_playtime</td>
+<td align="center">integer</td>
+<td align="center">“90”</td>
+</tr>
+<tr class="even">
+<td align="center">gt_min_age</td>
+<td align="center">min_age</td>
+<td align="center">integer</td>
+<td align="center">“4”</td>
+</tr>
+<tr class="odd">
+<td align="center">lt_min_age</td>
+<td align="center">max_age</td>
+<td align="center">integer</td>
+<td align="center">“10”</td>
+</tr>
+<tr class="even">
+<td align="center">gt_year_published</td>
+<td align="center">min_year</td>
+<td align="center">integer</td>
+<td align="center">“2010”</td>
+</tr>
+<tr class="odd">
+<td align="center">lt_year_published</td>
+<td align="center">max_year</td>
+<td align="center">integer</td>
+<td align="center">“2018”</td>
+</tr>
+<tr class="even">
+<td align="center">gt_price</td>
+<td align="center">min_price</td>
+<td align="center">double</td>
+<td align="center">“10.00”</td>
+</tr>
+<tr class="odd">
+<td align="center">lt_price</td>
+<td align="center">max_price</td>
+<td align="center">double</td>
+<td align="center">“75.00”</td>
+</tr>
+<tr class="even">
+<td align="center">gt_min_msrp</td>
+<td align="center">min_msrp</td>
+<td align="center">double</td>
+<td align="center">“30.00”</td>
+</tr>
+<tr class="odd">
+<td align="center">lt_max_msrp</td>
+<td align="center">max_msrp</td>
+<td align="center">double</td>
+<td align="center">“100.00”</td>
+</tr>
+<tr class="even">
+<td align="center">gt_min_discount</td>
+<td align="center">min_discount</td>
+<td align="center">double</td>
+<td align="center">“0.50”</td>
+</tr>
+<tr class="odd">
+<td align="center">lt_max_discount</td>
+<td align="center">max_discount</td>
+<td align="center">double</td>
+<td align="center">“-0.5”</td>
+</tr>
+<tr class="even">
+<td align="center">gt_reddit_count</td>
+<td align="center">min_reddit_total</td>
+<td align="center">integer</td>
+<td align="center">“100”</td>
+</tr>
+<tr class="odd">
+<td align="center">lt_reddit_count</td>
+<td align="center">lt_reddit_count</td>
+<td align="center">integer</td>
+<td align="center">“500”</td>
+</tr>
+<tr class="even">
+<td align="center">gt_reddit_week_coun</td>
+<td align="center">t min_reddit_week</td>
+<td align="center">integer</td>
+<td align="center">&quot;30</td>
+</tr>
+<tr class="odd">
+<td align="center">lt_reddit_week_coun</td>
+<td align="center">t max_reddit_week</td>
+<td align="center">integer</td>
+<td align="center">“100”</td>
+</tr>
+<tr class="even">
+<td align="center">gt_reddit_day_count</td>
+<td align="center">min_reddit_day</td>
+<td align="center">integer</td>
+<td align="center">“5”</td>
+</tr>
+<tr class="odd">
+<td align="center">lt_reddit_day_count</td>
+<td align="center">max_reddit_day</td>
+<td align="center">integer</td>
+<td align="center">“20”</td>
+</tr>
+<tr class="even">
+<td align="center">client_id</td>
+<td align="center">client_id_pat</td>
+<td align="center">string</td>
+<td align="center">“AfDFioajafsd”</td>
+</tr>
+</tbody>
+</table>
+<p>Please note that the client_id value above is not a real ID and will not work if specified.</p>
+</div>
+<div id="limit-skip" class="section level3">
+<h3>limit &amp; skip</h3>
+<p>An important thing to understand is that the BGA API is restricted to queries of no more than 100 objects per query. In order to get more than 100 games you have to use the skip feature to start where you left off. For instance, the first five games returned when ordered by popularity (at the time of writing this, 12/12/2019) are the following:</p>
+<table style="width:88%;">
+<colgroup>
+<col width="18%"></col>
+<col width="37%"></col>
+<col width="23%"></col>
+<col width="8%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">id</th>
+<th align="center">name</th>
+<th align="center">year_published</th>
+<th align="left">…</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">kPDxpJZ8PD</td>
+<td align="center">Spirit Island</td>
+<td align="center">2016</td>
+<td align="left">…</td>
+</tr>
+<tr class="even">
+<td align="center">RLlDWHh7hR</td>
+<td align="center">Gloomhaven</td>
+<td align="center">2017</td>
+<td align="left">…</td>
+</tr>
+<tr class="odd">
+<td align="center">i5Oqu5VZgP</td>
+<td align="center">Azul</td>
+<td align="center">2017</td>
+<td align="left">…</td>
+</tr>
+<tr class="even">
+<td align="center">yqR4PtpO8X</td>
+<td align="center">Scythe</td>
+<td align="center">2016</td>
+<td align="left">…</td>
+</tr>
+<tr class="odd">
+<td align="center">6FmFeux5xH</td>
+<td align="center">Pandemic</td>
+<td align="center">2008</td>
+<td align="left">…</td>
+</tr>
+</tbody>
+</table>
+<p>This could be queried with the following:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb3-1" data-line-number="1">first_<span class="dv">5</span> &lt;-<span class="st"> </span><span class="kw">search_bga</span>(<span class="dt">limit =</span> <span class="dv">5</span>, <span class="dt">skip =</span> <span class="dv">0</span>, <span class="dt">order_by =</span> <span class="st">&quot;popularity&quot;</span>)</a></code></pre></div>
+<p>The above code skips no games, returning the first object onward up to the limit, which in this case is 5 game objects. The default order_by value is popularity, which is based on the total number of times the game is mentioned at <a href="https://www.reddit.com/r/boardgames" class="uri">https://www.reddit.com/r/boardgames</a> - a subreddit - a kind of forum - that is based on the discussion and recommendation of board games.</p>
+<p>The 6th-10th games returned when ordered by popularity are as follows:</p>
+<table style="width:88%;">
+<colgroup>
+<col width="18%"></col>
+<col width="37%"></col>
+<col width="23%"></col>
+<col width="8%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">id</th>
+<th align="center">name</th>
+<th align="center">year_published</th>
+<th align="center">…</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">oGVgRSAKwX</td>
+<td align="center">Carcassonne</td>
+<td align="center">2000</td>
+<td align="center">…</td>
+</tr>
+<tr class="even">
+<td align="center">fDn9rQjH9O</td>
+<td align="center">Terraforming Mars</td>
+<td align="center">2016</td>
+<td align="center">…</td>
+</tr>
+<tr class="odd">
+<td align="center">TAAifFP590</td>
+<td align="center">Root</td>
+<td align="center">2018</td>
+<td align="center">…</td>
+</tr>
+<tr class="even">
+<td align="center">FCuXPSfhDR</td>
+<td align="center">Concordia</td>
+<td align="center">2013</td>
+<td align="center">…</td>
+</tr>
+<tr class="odd">
+<td align="center">6VQXkkC5ql</td>
+<td align="center">Dominion: Second Edition</td>
+<td align="center">2016</td>
+<td align="center">…</td>
+</tr>
+</tbody>
+</table>
+<p>And the above could be queried with the following:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb4-1" data-line-number="1">second_<span class="dv">5</span> &lt;-<span class="st">  </span><span class="kw">search_bga</span>(<span class="dt">limit =</span> <span class="dv">5</span>, <span class="dt">skip =</span> <span class="dv">5</span>, <span class="dt">order_by =</span> <span class="st">&quot;popularity&quot;</span>)</a></code></pre></div>
+<p>You can see above it skips the first 5 games and returns an additional 5 games, the limit.</p>
+<p>You can use this pattern to go beyond the 100 game limit of the API by requesting 100 games and then adjusting the skip value, like so:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb5-1" data-line-number="1">first_<span class="dv">100</span> &lt;-<span class="st"> </span><span class="kw">search_bga</span>(<span class="dt">limit =</span> <span class="dv">100</span>, <span class="dt">skip =</span> <span class="dv">0</span>, <span class="dt">order_by =</span> <span class="st">&quot;popularity&quot;</span>)</a>
+<a class="sourceLine" id="cb5-2" data-line-number="2">second_<span class="dv">100</span> &lt;-<span class="st"> </span><span class="kw">search_bga</span>(<span class="dt">limit =</span> <span class="dv">100</span>, <span class="dt">skip =</span> <span class="dv">100</span>, <span class="dt">order_by =</span> <span class="st">&quot;popularity&quot;</span>)</a></code></pre></div>
+<p>You could then merge the datasets with code along the lines of the following:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb6-1" data-line-number="1">first_<span class="dv">200</span> &lt;-<span class="st"> </span><span class="kw">cbind</span>(first_<span class="dv">100</span>, second_<span class="dv">100</span>)</a></code></pre></div>
+</div>
+<div id="string-arguments" class="section level3">
+<h3>String Arguments</h3>
+<div id="ids" class="section level4">
+<h4>ids</h4>
+<p>Individual games can be queried by using their internal ID values, which BGA uses to inventory games. These are not particularly human readable, however, and must be exact comma-separated matches. Incorrect ID strings can produce 404 errors in the API query, or simply return no games.</p>
+<p>The ID for the game The Settlers of Catan is SVQRjsXrhj. The ID for the game The Last Stand is OIXt3DmJU0. To return these games specfically, you would use this query:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb7-1" data-line-number="1">id_search &lt;-<span class="st"> </span><span class="kw">search_bga</span>(<span class="dt">ids=</span><span class="st">&quot;SVQRjsXrhj,OIXt3DmJU0&quot;</span>)</a></code></pre></div>
+<p>You can put in any number of ID values as long as they are all separated by commas and contain no spaces.</p>
+</div>
+<div id="name" class="section level4">
+<h4>name</h4>
+<p>It’s important to talk about what is probably the most logical way to search for a game, which is by its name. Name is relatively complicated in terms of this API, however.</p>
+<ul>
+<li>name, when used, will supposedly search for games based on the start of the string(s) provided to it. In practice, however, it seems to search for each word provided to it. For instance, name = “cata” returns a game called “Billy Biber.” name = “catan”, on the other hand, will turn up many games in the Catan family. We’ll discuss the exact and fuzzy augmentations later.</li>
+</ul>
+</div>
+<div id="designer-publisher-artist" class="section level4">
+<h4>designer, publisher, artist</h4>
+<p>The arguments designer, publisher, and artist all function as exact matches. This may make their usefulness more limited if there are any discrepencies or errors in these fields, but it may be useful to use to hone in on specific groups or individuals. This may be more useful to get complete sets of game families compared to searches by names. For instance, if I search for the publisher “Catan Studio” who designed the original Settlers of Catan game, I get 27 games back. In this case they are all Catan-family games. I can search this with the following query:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb8-1" data-line-number="1">publisher_search &lt;-<span class="st"> </span><span class="kw">search_bga</span>(<span class="dt">publisher =</span> <span class="st">&quot;Catan Studio&quot;</span>)</a></code></pre></div>
+<p>It’s important to note that these are the “primary” attributions, and sometimes games have multiple listed designers, artists, and publishers. A full list is contained int he all_designers, all_publishers, and all_artists variables. Additionally there is a variable for all_developers, which is not possible to query.</p>
+</div>
+<div id="mechanics" class="section level4">
+<h4>mechanics</h4>
+<p>Mechanics functions similar to ids, in that each mechanic has a specific ID value associated with it and can be queried by entering them as a comma separated list. The main issue is that the mechanics are somewhat ill defined, overlapping, and not always equally attributed to all games at this point. Still, it can be useful. For instance, if I want the 30 most popular games that have a dice rolling mechanic I can use the mechanics value of “R0bGq4cAl4” with the following code:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb9-1" data-line-number="1">dice_rolling_games &lt;-<span class="st"> </span><span class="kw">search_bga</span>(<span class="dt">mechanics=</span><span class="st">&quot;R0bGq4cAl4&quot;</span>)</a></code></pre></div>
+<p>For a complete list of the id values you can consult <a href="https://www.boardgameatlas.com/api/docs/game/mechanics" class="uri">https://www.boardgameatlas.com/api/docs/game/mechanics</a>, which allows you query <a href="https://www.boardgameatlas.com/api/game/mechanics" class="uri">https://www.boardgameatlas.com/api/game/mechanics</a>? and see all mechanics options. Unfortunately these have no listed formal definitions and thus may have limited usefulness. All <code>search_bga()</code> queries will return binary values of 1 for TRUE and 0 for FALSE for the attribution of each mechanics. Mechanics are also prepended with “mech_” in the variable names, for easy identification.</p>
+</div>
+<div id="categories" class="section level4">
+<h4>Categories</h4>
+<p>Like mechanics, categories also functions similar to ids, in that each mechanic has a specific ID value associated with it and can be queried by entering them as a comma separated list. The main issue is that the categories are somewhat ill defined, overlapping, and not always equally attributed to all games at this point. Still, it can be useful. For instance, if I want the 10 most popular games that are labeled as “Eurogames” - which are German-style board games that have risen to general popularity in the last several decades - I can use the categories value of “h8wfZG0j3I” with the following code:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><a class="sourceLine" id="cb10-1" data-line-number="1">eurogame_games &lt;-<span class="st"> </span><span class="kw">search_bga</span>(<span class="dt">categories=</span><span class="st">&quot;h8wfZG0j3I&quot;</span>, <span class="dt">limit =</span> <span class="dv">10</span>)</a></code></pre></div>
+<p>For a complete list of the ID values you can consult <a href="https://www.boardgameatlas.com/api/docs/game/categories" class="uri">https://www.boardgameatlas.com/api/docs/game/categories</a>, which allows you query <a href="https://www.boardgameatlas.com/api/game/categories" class="uri">https://www.boardgameatlas.com/api/game/categories</a>? and see all category options. Unfortunately these have no listed formal definitions and thus may have limited usefulness. All <code>search_bga()</code> queries will return binary values of 1 for TRUE and 0 for FALSE for the attribution of each category. Categories are also prepended with “cat_” in the variable names, for easy identification.</p>
+</div>
+<div id="order_by" class="section level4">
+<h4>order_by</h4>
+<p>The order_by variable takes specific string arguments. Typos or other values will cause the query to stop. The values are as follows:</p>
+<ul>
+<li><p>popularity - this is defined as the highest amount of comments mentioning the game on <a href="https://www.reddit.com/r/boardgames" class="uri">https://www.reddit.com/r/boardgames</a> since 2018.</p></li>
+<li><p>price - this orders from the highest listed price to lowest price.</p></li>
+<li><p>deadline - this only works if kickstarter = TRUE, and then returns games based on the earliest ending kickstarter campaign.</p></li>
+<li><p>discount - discount is a percentage based on the price / MSRP. This should not be greater than 1 (100%), but can be negative sometimes when the game is more expensive than the recommended retail price.</p></li>
+<li><p>average_user_rating - this orders games by the average user rating, which is a 0-5 scale of user generated ratings. It is unweighted, so games with even just a single vote my show up at the top of the list.</p></li>
+<li><p>num_user_ratings - this orders games by the number of user ratings, with the highest number of ratings are returned first. This may arguably be a more useful measure of “popularity” than the reddit comments used in the official “popularity” setting of order_by.</p></li>
+<li><p>reddit_total_count - This returns games with the highest number of comments in which the game was mentioned from <a href="https://www.reddit.com/r/boardgames" class="uri">https://www.reddit.com/r/boardgames</a> since BGA began collecting the data in 2018.</p></li>
+<li><p>reddit_week_count - This returns games with the highest number of comments in which the game was mentioned from <a href="https://www.reddit.com/r/boardgames" class="uri">https://www.reddit.com/r/boardgames</a> in the past week.</p></li>
+<li><p>reddit_day_count - This returns games with the highest number of comments in which the game was mentioned from <a href="https://www.reddit.com/r/boardgames" class="uri">https://www.reddit.com/r/boardgames</a> from the previous day of the query.</p></li>
+<li><p>name - this returns games in alphabetical order of the games’ names.</p></li>
+<li><p>year_published - this returns games with the highest “year_published” value first. Unfortunately, the API does not currently differentiate between BCE and CE, meaning that games like Go, which were invented in roughly 2200 BCE show up near the top of the list, with a year_published value of 2200. Future work may include coding that games with values higher than the present year may be set to negative values, but this requires more investigation.</p></li>
+<li><p>min_age - this returns games in order of the highest minimum age to the lowest minimum age.</p></li>
+<li><p>min_playtime - this returns games in order of the highest minimum playtime to the lowest minimum playtime.</p></li>
+<li><p>max_playtime - this returns games in order of the highest maximum playtime to the lowest maximum playtime.</p></li>
+<li><p>min_players - this returns games in order of the highest number of minimum players to the lowest number of minimum players.</p></li>
+<li><p>max_players - this returns games in order of the highest number of maximum players to the lowest number of maximum players.</p></li>
+</ul>
+</div>
+</div>
+<div id="logical-arguments" class="section level3">
+<h3>Logical Arguments</h3>
+<p>The <code>search_bga()</code> function includes a number of logical arguments, including kickstarter, random, name_exact, name_fuzzy, ascending.</p>
+<ul>
+<li>kickstarter - WARNING this has an existing API problem (not in this code) where specifying kicstarter as ANYTHING (TRUE, FALSE, or NULL) will return active board game kickstarter campaigns. These have not yet completed their campaigns. An issue with the API is that if kickstarter is set to FALSE or NULL it will still produce kickstarter games, as it seems to be linked to a page of the site devoted to Kickstarter games.</li>
+</ul>
+<p>To avoid Kickstarter games, simply DO NOT SPECIFY KICKSTARTER in your query.</p>
+<p>Kickstarter has been a popular platform for funding board games in recent years, so data regarding the games funded this way may be useful, but the current API has some issues. This will hopefully change as the platform develops.</p>
+<ul>
+<li><p>random, if set to TRUE, will return random board games. Compared to the kickstarter argument this plays more nicely with other arguments. Behind the curtain, random behaves differently from all other boolean values, not requiring any coerscion from a traditional R logical boolean unlike the other values.</p></li>
+<li><p>name_exact &amp; name_fuzzy both augment the name argument, but it’s somewhat unclear how. For instance, while searching for search_bga(name = “Settlers of Catan”) returned 23 games, including many games with that exact phrasing, search_bga(name = “Settlers of Catan”, name_exact = TRUE) returned none, and search_bga(name = “Settlers of Catan”, name_fuzzy = TRUE) returned only 9, most of which contained “Settlers of Catan” in the name.</p></li>
+<li><p>ascending, if FALSE, will return the top values - e.g. the “most popular” game if order_by is set to “popularity.” Conversely, setting it to TRUE will draw from the bottom of the list, but how it is ordered with games with the same value is unclear.</p></li>
+</ul>
+</div>
+<div id="gameplay-statistics" class="section level3">
+<h3>Gameplay Statistics</h3>
+<p>The BGA API has multiple ways of querying certian values, such as an exact match, “less than” (e.g. lt_min_players), and “greater than” (e.g. gt_max_players) versions of most metrics. To simplify this system and maximize functionality, I focused on the query arguments that allowed for the building of ranges of requests. In most cases I created a bottom floor and a ceiling variable, which allow for the querying of specific values by making the two values equal. Down the line it might be valuable to add smoe of these other versions, but this provided the most elegant and simple solution to capturing, theoretically, every useful range of data.</p>
+<ul>
+<li><p>min_players &amp; max_players, these are integer values that map onto the “gt_min_players” and “lt_max_players” values, respectively. This means that you can set the minimum amount of players and the maximum amount. One issue is one could theoretically set the minimum above the maximum, which returns mostly mislabled games.</p></li>
+<li><p>min_playtime &amp; max_playtime, like players, these map to a similar range of “gt_min_playtime” and “lt_max_playtime”, respectively, to create a range of gameplay times. One major issue is that some games do not have a maximum playtime. These are measuring number of minutes, so a value of “60” means 60 minutes.</p></li>
+<li><p>min_age &amp; max_age, games don’t typically have a maximum age range, and in fact the BGA API only provides a min_age variable. This was designed to provide ranges of minimum age values using “gt_min_age” and “lt_min_age”, respectively. This measures years of age.</p></li>
+<li><p>min_year &amp; max_year follow a similar pattern to age of mapping onto “gt_year_published” and “lt_year_published” to produce a range of year values.</p></li>
+</ul>
+<p>Some sample values that these query arguments check against these can be seen below:</p>
+<table>
+<colgroup>
+<col width="20%"></col>
+<col width="16%"></col>
+<col width="16%"></col>
+<col width="17%"></col>
+<col width="17%"></col>
+<col width="11%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">year_published</th>
+<th align="center">min_players</th>
+<th align="center">max_players</th>
+<th align="center">min_playtime</th>
+<th align="center">max_playtime</th>
+<th align="center">min_age</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">2016</td>
+<td align="center">1</td>
+<td align="center">4</td>
+<td align="center">90</td>
+<td align="center">120</td>
+<td align="center">13</td>
+</tr>
+<tr class="even">
+<td align="center">2017</td>
+<td align="center">1</td>
+<td align="center">4</td>
+<td align="center">60</td>
+<td align="center">150</td>
+<td align="center">12</td>
+</tr>
+<tr class="odd">
+<td align="center">2017</td>
+<td align="center">2</td>
+<td align="center">4</td>
+<td align="center">30</td>
+<td align="center">60</td>
+<td align="center">8</td>
+</tr>
+<tr class="even">
+<td align="center">2016</td>
+<td align="center">1</td>
+<td align="center">5</td>
+<td align="center">90</td>
+<td align="center">120</td>
+<td align="center">14</td>
+</tr>
+<tr class="odd">
+<td align="center">2008</td>
+<td align="center">2</td>
+<td align="center">4</td>
+<td align="center">45</td>
+<td align="center">60</td>
+<td align="center">8</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div id="pricing" class="section level2">
+<h2>Pricing</h2>
+<ul>
+<li><p>min_price &amp; max_price - Like in the gameplay statistics arguments, these set minimum and maximum ranges of financial values. In this case, the minimum and maximum price in USD that the game is listed online. These equate to gt_price and lt_price respectively.</p></li>
+<li><p>min_msrp &amp; max_msrp - similarly to price, these set minimum and maximum ranges of the manufacturer’s suggested retail price (MSRP). These equate to gt_min_msrp and lt_max_msrp respectively.</p></li>
+<li><p>min_discount &amp; max_discount - the discount amount is 1 minusthe price value divided by the MSRP (1 - (price/msrp). These map onto gt_min_discount and lt_max_discount, respectively.</p></li>
+</ul>
+</div>
+<div id="data" class="section level2">
+<h2>Data</h2>
+<p><code>search_bga()</code> will return up to 100 observations (depending on what limit is set to) and 254 variables. These include some of the aforementioned game statistics, reviews, names and people associated with it as well as descriptions of the games, links to the game image and URLs. It also includes kickstarter data (if kickstarter=TRUE), price data, physical box dimensions, reddit comments, and a large number of mechanics and categories attributed to the game. Below I will give some examples of the data types not covered above.</p>
+<div id="textual-data" class="section level3">
+<h3>Textual Data</h3>
+<p>Text variables include description (below), image_url, url, official_url, rules_url, kickstarter_url, as well as the various name variables.</p>
+<table style="width:46%;">
+<colgroup>
+<col width="45%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">description</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Powerful Spirits have existed on this isolated island for time immemorial. They are both part of the natural world and - at the same time - something beyond nature. Native Islanders, known as the Dahan, have learned how to co-exist with the spirits, but with a healthy dose of fear and reverence. However, now, the island has been “discovered” by invaders from a far-off land. These would-be colonists are taking over the land and upsetting the natural balance, destroying the presence of Spirits as they go. As Spirits, you must grow in power and work together to drive the invaders from your island… before it’s too late!</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="monetary-data" class="section level3">
+<h3>Monetary Data</h3>
+<p>The monetary data revolves around price, MSRP, and recorded price values all in USD. 1 - (price / msrp) generates the discount value and the historical low price is the recorded lowest price. There are historical prices on BGA but require use of another API that will be added in the future.</p>
+<table>
+<colgroup>
+<col width="10%"></col>
+<col width="10%"></col>
+<col width="15%"></col>
+<col width="31%"></col>
+<col width="31%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">price</th>
+<th align="center">msrp</th>
+<th align="center">discount</th>
+<th align="center">historical_low_price</th>
+<th align="center">historical_low_date</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">53.99</td>
+<td align="center">79.95</td>
+<td align="center">0.32</td>
+<td align="center">47.97</td>
+<td align="center">2019-11-27</td>
+</tr>
+<tr class="even">
+<td align="center">99.4</td>
+<td align="center">140</td>
+<td align="center">0.29</td>
+<td align="center">80.75</td>
+<td align="center">2019-07-15</td>
+</tr>
+<tr class="odd">
+<td align="center">18.99</td>
+<td align="center">39.99</td>
+<td align="center">0.53</td>
+<td align="center">17.99</td>
+<td align="center">2019-08-03</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="publisher-data" class="section level3">
+<h3>Publisher Data</h3>
+<p>Below you can see some examples of publishers and designers. the all_* variables are often comma separated lists of names.</p>
+<table>
+<colgroup>
+<col width="29%"></col>
+<col width="44%"></col>
+<col width="26%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">primary_publisher</th>
+<th align="center">all_publishers</th>
+<th align="center">all_designers</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">Greater Than Games</td>
+<td align="center">Greater Than Games</td>
+<td align="center">R. Eric Reuss</td>
+</tr>
+<tr class="even">
+<td align="center">Cephalofair Games</td>
+<td align="center">Cephalofair Games</td>
+<td align="center">Isaac Childres</td>
+</tr>
+<tr class="odd">
+<td align="center">Next Move Games</td>
+<td align="center">Next Move Games, Plan B Games</td>
+<td align="center">Michael Kiesling</td>
+</tr>
+</tbody>
+</table>
+<p>So far it appears that no game has developers attributed yet.</p>
+<table style="width:69%;">
+<colgroup>
+<col width="23%"></col>
+<col width="45%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">all_developers</th>
+<th align="center">all_artists</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center"></td>
+<td align="center">Jason Behnke, Kat G Bermelin, Loïc Billiau, Cari Corene, Lucas Durham, Rocky Hammer, Sydni Kruger, Nolan Nasser, Jorge Ramos, Adam Rebottaro, Moro Rogers, Graham Sternberg, Shane Tyree, Joshua Wright (I)</td>
+</tr>
+<tr class="even">
+<td align="center"></td>
+<td align="center">Alexandr Elichev, Josh T. McDowell, Alvaro Nebot</td>
+</tr>
+<tr class="odd">
+<td align="center"></td>
+<td align="center">Philippe Guérin, Chris Quilliams</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="user-ratings" class="section level3">
+<h3>User Ratings</h3>
+<p>These are user ratings registered on the BGA website. As said previously, they range from 0-5 for games, 5 being the top and 0 being the lowest.</p>
+<table style="width:57%;">
+<colgroup>
+<col width="26%"></col>
+<col width="30%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">num_user_ratings</th>
+<th align="center">average_user_rating</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">126</td>
+<td align="center">3.937</td>
+</tr>
+<tr class="even">
+<td align="center">132</td>
+<td align="center">4.159</td>
+</tr>
+<tr class="odd">
+<td align="center">208</td>
+<td align="center">3.633</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="physical-game-data" class="section level3">
+<h3>Physical Game Data</h3>
+<p>These are board game box dimensions, typically in inches:</p>
+<table style="width:74%;">
+<colgroup>
+<col width="19%"></col>
+<col width="18%"></col>
+<col width="18%"></col>
+<col width="18%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">size_height</th>
+<th align="center">size_width</th>
+<th align="center">size_depth</th>
+<th align="center">size_units</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">11.6</td>
+<td align="center">3</td>
+<td align="center">11.6</td>
+<td align="center">inches</td>
+</tr>
+<tr class="even">
+<td align="center">16.2</td>
+<td align="center">7.5</td>
+<td align="center">11.8</td>
+<td align="center">inches</td>
+</tr>
+<tr class="odd">
+<td align="center">10.2</td>
+<td align="center">2.8</td>
+<td align="center">10.2</td>
+<td align="center">inches</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="reddit-data" class="section level3">
+<h3>Reddit Data</h3>
+<p>The reddit data comes begins in 2018, when BGA began tracking the information on <a href="https://www.reddit.com/r/boardgames" class="uri">https://www.reddit.com/r/boardgames</a> - a type of forum known as a subreddit - where people interested in board games can discuss and recommend games with each other. The measurements are total (since 2018), the past week, and the past day. There is also a query data variable created to put these in context:</p>
+<table>
+<colgroup>
+<col width="30%"></col>
+<col width="25%"></col>
+<col width="24%"></col>
+<col width="20%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">reddit_all_time_count</th>
+<th align="center">reddit_week_count</th>
+<th align="center">reddit_day_count</th>
+<th align="center">date_of_query</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">1499</td>
+<td align="center">9</td>
+<td align="center">13</td>
+<td align="center">2019-12-13</td>
+</tr>
+<tr class="even">
+<td align="center">1392</td>
+<td align="center">13</td>
+<td align="center">35</td>
+<td align="center">2019-12-13</td>
+</tr>
+<tr class="odd">
+<td align="center">1173</td>
+<td align="center">10</td>
+<td align="center">9</td>
+<td align="center">2019-12-13</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="mechanics-1" class="section level3">
+<h3>Mechanics</h3>
+<p>Each <code>search_bga()</code> query parses the list of mechanics and then creates a binary variable (0-1) if the mechanic is labeled for the game. Numeric binary values were chosen for ease of use but may be changed to logical boolean values in the future. Below you can see a small selection of how this data may look in practice:</p>
+<table>
+<colgroup>
+<col width="29%"></col>
+<col width="37%"></col>
+<col width="32%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">mech_action_movement</th>
+<th align="center">mech_action_point_allowance</th>
+<th align="center">mech_action_selection</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">1</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="categories-1" class="section level3">
+<h3>Categories</h3>
+<p>Each <code>search_bga()</code> query parses the list of categories and then creates a binary variable (0-1) if the category is labeled for the game. Numeric binary values were chosen for ease of use but may be changed to logical boolean values in the future. Below you can see a small selection of how this data may look in practice:</p>
+<table style="width:99%;">
+<colgroup>
+<col width="20%"></col>
+<col width="22%"></col>
+<col width="27%"></col>
+<col width="27%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="center">cat_campaign</th>
+<th align="center">cat_card_game</th>
+<th align="center">cat_children_game</th>
+<th align="center">cat_city_building</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="even">
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+<td align="center">0</td>
+</tr>
+<tr class="odd">
+<td align="center">0</td>
+<td align="center">1</td>
+<td align="center">0</td>
+<td align="center">1</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

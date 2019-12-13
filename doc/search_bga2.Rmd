@@ -1,0 +1,239 @@
+---
+title: "Introduction to search_bga()"
+author: "Michael Weisner"
+date: "12/12/2019"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to search_bga()}
+  %\VignetteEngine{knitr::rmarkdown}
+  \usepackage[utf8]{inputenc}
+---
+
+```{r, echo = FALSE, message = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+library(knitr)
+library(dplyr)
+```
+
+```{r setup}
+library(boardgameatlasR)
+```
+
+## Introduction
+The boardgameatlasR package contains a function called `search_bga()`. `search_bga()` is an API wrapper for the API of https://www.boardgameatlas.com.
+
+This vignette will cover a few of the basic usages of `search_bga()` and how to avoid some common mistakes.
+
+## Setup
+Before you get started, you'll have to take the following steps:
+
+* Register with https://www.boardgameatlas.com
+
+* Create an "app" to get your client_id
+
+* Add your client_id value to your R environment as "BOARDGAMEATLAS_PAT"
+
+## Adding your client_id to your R Environment
+
+You can add the token with code like edit_r_environ() from the usethis package
+
+
+And then enter your BGA client_id in the following manner into your .Renviron file:
+
+```{r, evaluate = FALSE}
+# Boardgame Atlas API Key
+BOARDGAMEATLAS_PAT = "YOUR_CLIENT_ID"
+```
+
+Once you have done this, you'll have to restart R or your R session for the changes to take effect.
+
+## Arguments of search_bga()
+
+### limit & skip
+
+An important thing to understand is that the BGA API is restricted to queries of no more than 100 objects per query. In order to get more than 100 games you have to use the skip feature to start where you left off. For instance, the first five games returned when ordered by popularity (at the time of writing this, 12/12/2019) are the following:
+
+--------------------------------------------------------
+     id                 name             year_published 
+------------ -------------------------- ----------------
+ kPDxpJZ8PD        Spirit Island              2016      
+
+ RLlDWHh7hR          Gloomhaven               2017      
+
+ i5Oqu5VZgP             Azul                  2017      
+
+ yqR4PtpO8X            Scythe                 2016      
+
+ 6FmFeux5xH           Pandemic                2008      
+--------------------------------------------------------
+
+This could be queried with the following:
+
+```{r, evaluate = FALSE}
+search_bga(limit = 5, skip = 0, order_by = "popularity")
+```
+
+The above code skips no games, returning the first object onward up to the limit, which in this case is 5 game objects. The default order_by value is popularity, which is based on the total number of times the game is mentioned at https://www.reddit.com/r/boardgames - a subreddit - a kind of forum - that is based on the discussion and recommendation of board games.
+
+The 6th-10th  games returned when ordered by popularity are as follows:
+
+--------------------------------------------------------
+     id                 name             year_published 
+------------ -------------------------- ----------------
+ oGVgRSAKwX         Carcassonne               2000      
+
+ fDn9rQjH9O      Terraforming Mars            2016      
+
+ TAAifFP590             Root                  2018      
+
+ FCuXPSfhDR          Concordia                2013      
+
+ 6VQXkkC5ql   Dominion: Second Edition        2016      
+--------------------------------------------------------
+
+And the above could be queried with the following:
+```{r, evaluate = FALSE}
+search_bga(limit = 5, skip = 5, order_by = "popularity")
+```
+
+You can see above it skips the first 5 games and returns an additional 5 games, the limit.
+
+You can use this pattern to go beyond the 100 game limit of the API by requesting 100 games and then adjusting the skip value, like so:
+
+```{r, evaluate = FALSE}
+games_1_to_100 <- search_bga(limit = 100, skip = 0, order_by = "popularity")
+games_101_to_200 <- search_bga(limit = 100, skip = 100, order_by = "popularity")
+```
+
+You could then merge the datasets with code along the lines of the following:
+
+```{r, evaluate = FALSE}
+games_1_to_200 <- cbind(games_1_to_100, games_101_to_200)
+```
+
+### name
+
+It's important to talk about what is probably the most logical way to search for a game, which is by its name. Name is relatively complicated in terms of this API, however.
+
+* name, when used, will supposedly search for games based on the start of the string(s) provided to it. In practice, however, it seems to search for each word provided to it. For instance, name = "cata" returns a game called "Billy Biber." name = "catan", on the other hand, will turn up many games in the Catan family. We'll discuss the exact and fuzzy augmentations later.
+
+### order_by
+
+The order_by variable takes specific string arguments. Typos or other values will cause the query to stop. The values are as follows:
+
+* popularity - this is defined as the highest amount of comments mentioning the game on https://www.reddit.com/r/boardgames since 2018.
+
+* price - this orders from the highest listed price to lowest price.
+
+* deadline - this only works if kickstarter = TRUE, and then returns games based on the earliest ending kickstarter campaign.
+
+* discount - discount is a percentage based on the price / MSRP. This should not be greater than 1 (100%), but can be negative sometimes when the game is more expensive than the recommended retail price.
+
+* average_user_rating - [SECTION COMING SOON]
+
+* num_user_ratings - [SECTION COMING SOON]
+
+* reddit_week_count - [SECTION COMING SOON]
+
+* reddit_day_count - [SECTION COMING SOON]
+
+* name, year_published - [SECTION COMING SOON]
+
+* min_age - [SECTION COMING SOON]
+
+* min_playtime - [SECTION COMING SOON]
+
+* max_playtime - [SECTION COMING SOON]
+
+* min_players - [SECTION COMING SOON]
+
+* max_players - [SECTION COMING SOON]
+
+### Logical Arguments
+
+The `search_bga()` function includes a number of logical arguments, including kickstarter, random, name_exact, name_fuzzy, ascending.
+
+* kickstarter, if set to TRUE, will return active board game kickstarter campaigns. These have not yet completed their campaigns. Setting this to FALSE will avoid these in-development games. Kickstarter has been a popular platform for funding board games in recent years, so data regarding the games funded this way may be useful. This may change as the platform develops.
+
+* random, if set to TRUE, will return random board games. Compared to the kickstarter argument this plays more nicely with other arguments. Behind the curtain, random behaves differently from all other boolean values, not requiring any coerscion from a traditional R logical boolean unlike the other values.
+
+* name_exact & name_fuzzy both augment the name argument, but it's somewhat unclear how. For instance, while searching for search_bga(name = "Settlers of Catan") returned 23 games, including many games with that exact phrasing, search_bga(name = "Settlers of Catan", name_exact = TRUE) returned none, and search_bga(name = "Settlers of Catan", name_fuzzy = TRUE) returned only 9, most of which contained "Settlers of Catan" in the name.
+
+* ascending, if FALSE, will return the top values - e.g. the "most popular" game if order_by is set to "popularity." Conversely, setting it to TRUE will draw from the bottom of the list, but how it is ordered with games with the same value is unclear. 
+
+### Gameplay Statistics
+
+The BGA API has multiple ways of querying certian values, such as an exact match, "less than" (e.g. lt_min_players), and "greater than" (e.g. gt_max_players) versions of most metrics. To simplify this system and maximize functionality, I focused on the query arguments that allowed for the building of ranges of requests. In most cases I created a bottom floor and a ceiling variable, which allow for the querying of specific values by making the two values equal. Down the line it might be valuable to add smoe of these other versions, but this provided the most elegant and simple solution to capturing, theoretically, every useful range of data.
+
+* min_players & max_players, these are integer values that map onto the "gt_min_players" and "lt_max_players" values, respectively. This means that you can set the minimum amount of players and the maximum amount. One issue is one could theoretically set the minimum above the maximum, which returns mostly mislabled games.
+
+* min_playtime & max_playtime, like players, these map to a similar range of "gt_min_playtime" and "lt_max_playtime", respectively, to create a range of gameplay times. One major issue is that some games do not have a maximum playtime.
+
+* min_age & max_age, games don't typically have a maximum age range, and in fact the BGA API only provides a min_age variable. This was designed to provide ranges of minimum age values using "gt_min_age" and "lt_min_age", respectively.
+
+* min_year & max_year follow a similar pattern to age of mapping onto "gt_year_published" and "lt_year_published" to produce a range of year values.
+
+The some sample values of these can be seen below:
+
+------------------------------------------------------------------------------------
+ year_published   min_players   max_players   min_playtime   max_playtime   min_age 
+---------------- ------------- ------------- -------------- -------------- ---------
+      2016             1             4             90            120          13    
+
+      2017             1             4             60            150          12    
+
+      2017             2             4             30             60           8    
+
+      2016             1             5             90            120          14    
+
+      2008             2             4             45             60           8    
+------------------------------------------------------------------------------------
+
+## Pricing
+
+* min_price & max_price
+
+* min_msrp & max_msrp
+
+* min_discount & max_discount
+
+## Data
+
+[SECTION COMING SOON]
+
+### Textual Data
+
+[SECTION COMING SOON]
+
+### Monetary Data
+
+[SECTION COMING SOON]
+
+### Publisher Data
+
+[SECTION COMING SOON]
+
+### Physical Data
+
+[SECTION COMING SOON]
+
+### Reddit Data
+
+[SECTION COMING SOON]
+
+### Mechanics
+
+[SECTION COMING SOON]
+
+### Categories
+
+[SECTION COMING SOON]
+
+### Returned Data Basics
+
+[SECTION COMING SOON]
+
+
