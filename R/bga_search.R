@@ -3,10 +3,10 @@
 #'
 #' @name search_bga
 #' @description search_bga() provides a wrapper for the search function of the Board Game Atlas (BGA) API.
-#' documentation on the API can be found at https://www.boardgameatlas.com/api/docs.
+#' documentation on the API can be found at https://api.boardgameatlas.com/api/docs.
 #' Please note that this function only covers the search of the BGA API.
-#' Game mechanic ID values can be found at https://www.boardgameatlas.com/api/docs/game/mechanics
-#' Game category ID values can be found at https://www.boardgameatlas.com/api/docs/game/categories
+#' Game mechanic ID values can be found at https://api.boardgameatlas.com/api/docs/game/mechanics
+#' Game category ID values can be found at https://api.boardgameatlas.com/api/docs/game/categories
 #'
 #' @param limit int - limits the number of results returned. The max limit is 100. The default is 30.
 #' @param skip int - Skips the number of results provided. It's generally used for paging results.

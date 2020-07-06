@@ -36,7 +36,7 @@ check_status <- function(res){
 bga_pat <- function() {
   pat <- Sys.getenv('BOARDGAMEATLAS_PAT')
   if (identical(pat, "")) {
-    warning("Warning: Please set env var BOARDGAMEATLAS_PAT to your Board Game Atlas personal client_id. \n If you don't have a client_id, you can sign up at https://www.boardgameatlas.com/api/docs. \n This will not prevent you from manually entering your client_id value, but it's safer to add it to your R environment as BOARDGAMEATLAS_PAT so then search_bga() will use it automatically.",
+    warning("Warning: Please set env var BOARDGAMEATLAS_PAT to your Board Game Atlas personal client_id. \n If you don't have a client_id, you can sign up at https://api.boardgameatlas.com/api/docs. \n This will not prevent you from manually entering your client_id value, but it's safer to add it to your R environment as BOARDGAMEATLAS_PAT so then search_bga() will use it automatically.",
          call. = FALSE)
   }
   pat
@@ -44,7 +44,7 @@ bga_pat <- function() {
 
 client_id <- Sys.getenv('BOARDGAMEATLAS_PAT')
 
-base_url <- "https://www.boardgameatlas.com/api/search"
+base_url <- "https://api.boardgameatlas.com/api/search"
 
 # args tests
 limit_check <- function(limit){
